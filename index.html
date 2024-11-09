@@ -8,6 +8,12 @@
 <body>
     <h1>Welcome to My Teachable Machine Model</h1>
     <p>This is a simple example of a Teachable Machine model embedded on my site.</p>
+    
+    <!-- Container for the model -->
+    <div id="container" style="width: 640px; height: 480px; background-color: lightgray;">
+        <p id="status">Loading model...</p>
+    </div>
+    
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
     <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image"></script>
     <script>
@@ -15,7 +21,26 @@
         async function loadModel() {
             model = await tmImage.load('https://ilovepython-47.github.io/sorting/model.json');
             console.log("Model loaded!");
+            document.getElementById('status').innerHTML = "Model Loaded!";
+
+            // Load the webcam and start the prediction
+            const webcam = await tmImage.Webcam.create();
+            await webcam.setup(); 
+            await webcam.play();
+
+            // Show the webcam feed
+            document.getElementById('container').appendChild(webcam.canvas);
+            
+            // Start predicting the images from the webcam
+            predict(webcam);
         }
+
+        async function predict(webcam) {
+            const prediction = await model.predict(webcam.canvas);
+            console.log(prediction);
+            requestAnimationFrame(() => predict(webcam));
+        }
+
         window.onload = loadModel;
     </script>
 </body>
