@@ -23,13 +23,15 @@
             console.log("Model loaded!");
             document.getElementById('status').innerHTML = "Model Loaded!";
 
-            // Load the webcam and start the prediction
             const webcam = await tmImage.Webcam.create();
-            await webcam.setup(); 
-            await webcam.play();
-
-            // Show the webcam feed
-            document.getElementById('container').appendChild(webcam.canvas);
+            try {
+              await webcam.setup(); // Request webcam access
+              await webcam.play();
+              console.log("Webcam is working");
+              document.getElementById('container').appendChild(webcam.canvas);
+            } catch (err) {
+              console.log("Webcam setup failed", err);
+            }
             
             // Start predicting the images from the webcam
             predict(webcam);
