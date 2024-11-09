@@ -8,38 +8,48 @@
 <body>
     <h1>Welcome to My Teachable Machine Model</h1>
     <p>This is a simple example of a Teachable Machine model embedded on my site.</p>
-    
+
     <!-- Container for the model -->
     <div id="container" style="width: 640px; height: 480px; background-color: lightgray;">
         <p id="status">Loading model...</p>
     </div>
-    
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image"></script>
+
+    <!-- Include TensorFlow.js and Teachable Machine Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.11.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@0.8.4"></script>
+
+    <!-- Your Custom JavaScript Code -->
     <script>
         let model;
         async function loadModel() {
-            model = await tmImage.load('https://ilovepython-47.github.io/sorting/model.json');
-            console.log("Model loaded!");
-            document.getElementById('status').innerHTML = "Model Loaded!";
-
-            const webcam = await tmImage.Webcam.create();
             try {
-              await webcam.setup(); // Request webcam access
-              await webcam.play();
-              console.log("Webcam is working");
-              document.getElementById('container').appendChild(webcam.canvas);
-            } catch (err) {
-              console.log("Webcam setup failed", err);
+                // Load the model
+                model = await tmImage.load('https://ilovepython-47.github.io/sorting/model.json');
+                console.log("Model loaded!");
+                document.getElementById('status').innerHTML = "Model Loaded!";
+                
+                // Set up webcam
+                const webcam = await tmImage.Webcam.create();
+                try {
+                  await webcam.setup(); // Request webcam access
+                  await webcam.play();
+                  console.log("Webcam is working");
+                  document.getElementById('container').appendChild(webcam.canvas);
+                } catch (err) {
+                  console.log("Webcam setup failed", err);
+                }
+                
+                // Start predictions
+                predict(webcam);
+            } catch (error) {
+                console.error('Error loading model or webcam:', error);
+                document.getElementById('status').innerHTML = "Error loading model or webcam.";
             }
-            
-            // Start predicting the images from the webcam
-            predict(webcam);
         }
 
         async function predict(webcam) {
-            const prediction = await model.predict(webcam.canvas);
-            console.log(prediction);
+            const predictions = await model.predict(webcam.canvas);
+            console.log(predictions);
             requestAnimationFrame(() => predict(webcam));
         }
 
@@ -47,3 +57,4 @@
     </script>
 </body>
 </html>
+
